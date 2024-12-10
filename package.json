@@ -11,6 +11,10 @@
   "bin": {
     "create-bridge": "./dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hashenoki/create-bridge"
+  },
   "files": [
     "dist"
   ],
