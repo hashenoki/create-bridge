@@ -18,7 +18,7 @@ import { isFolderEmpty } from './helpers/is-folder-empty'
 import { getOnline } from './helpers/is-online'
 import { isWriteable } from './helpers/is-writeable'
 
-import type { TemplateMode, TemplateType } from './templates'
+import type { TemplateType } from './templates'
 import { getTemplateFile, installTemplate } from './templates'
 
 export class DownloadError extends Error {}
@@ -28,37 +28,25 @@ export async function createApp({
   packageManager,
   example,
   examplePath,
-  // typescript,
-  // tailwind,
   eslint,
   drizzle,
-  // app,
-  // srcDir,
   importAlias,
   skipInstall,
   empty,
-  // turbopack,
   disableGit,
 }: {
   appPath: string
   packageManager: PackageManager
   example?: string
   examplePath?: string
-  // typescript: boolean
-  // tailwind: boolean
   drizzle: boolean
   eslint: boolean
-  // app: boolean
-  // srcDir: boolean
   importAlias: string
   skipInstall: boolean
   empty: boolean
-  // turbopack: boolean
   disableGit?: boolean
 }): Promise<void> {
   let repoInfo: RepoInfo | undefined
-  // const mode: TemplateMode = typescript ? 'ts' : 'js'
-  const mode: TemplateMode = 'ts';
   // const template: TemplateType = `${app ? 'app' : 'default'}${tailwind ? '-tw' : ''}${empty ? '-empty' : ''}`
   // const template: TemplateType = `default${drizzle ? '-drizzle' : ''}${empty ? '-empty' : ''}`
   const template: TemplateType = `default${drizzle ? '-drizzle' : ''}`
@@ -148,7 +136,7 @@ export async function createApp({
   const isOnline = !useYarn || (await getOnline())
   const originalDirectory = process.cwd()
 
-  console.log(`Creating a new Next.js app in ${green(root)}.`)
+  console.log(`Creating new app in ${green(root)}.`)
   console.log()
 
   process.chdir(root)
@@ -201,17 +189,8 @@ export async function createApp({
     const ignorePath = join(root, '.gitignore')
     if (!existsSync(ignorePath)) {
       copyFileSync(
-        getTemplateFile({ template, mode, file: 'gitignore' }),
+        getTemplateFile({ template, file: 'gitignore' }),
         ignorePath
-      )
-    }
-
-    // Copy `next-env.d.ts` to any example that is typescript
-    const tsconfigPath = join(root, 'tsconfig.json')
-    if (existsSync(tsconfigPath)) {
-      copyFileSync(
-        getTemplateFile({ template, mode: 'ts', file: 'next-env.d.ts' }),
-        join(root, 'next-env.d.ts')
       )
     }
 
@@ -232,16 +211,12 @@ export async function createApp({
       appName,
       root,
       template,
-      mode,
       packageManager,
       isOnline,
-      // tailwind,
       drizzle,
       eslint,
-      // srcDir,
       importAlias,
       skipInstall,
-      // turbopack,
     })
   }
 

@@ -5,11 +5,9 @@ export type TemplateType =
   | "default-empty"
   | "default-drizzle"
   | "default-drizzle-empty";
-export type TemplateMode = "js" | "ts";
 
 export interface GetTemplateFileArgs {
   template: TemplateType;
-  mode: TemplateMode;
   file: string;
 }
 
@@ -19,12 +17,8 @@ export interface InstallTemplateArgs {
   packageManager: PackageManager;
   isOnline: boolean;
   template: TemplateType;
-  mode: TemplateMode;
-  eslint: boolean;
   drizzle: boolean;
-  // tailwind: boolean;
-  // srcDir: boolean;
+  eslint: boolean;
   importAlias: string;
   skipInstall: boolean;
-  // turbopack: boolean;
 }

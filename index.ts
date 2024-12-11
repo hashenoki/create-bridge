@@ -220,9 +220,8 @@ async function run(): Promise<void> {
 
   if (!example) {
     const defaults: typeof preferences = {
-      // typescript: true,
-      eslint: true,
       drizzle: true,
+      eslint: true,
       importAlias: '~/*',
       customizeImportAlias: false,
       empty: false,
@@ -230,42 +229,6 @@ async function run(): Promise<void> {
     }
     const getPrefOrDefault = (field: string) =>
       preferences[field] ?? defaults[field]
-
-    // if (!opts.typescript && !opts.javascript) {
-    //   if (skipPrompt) {
-    //     // default to TypeScript in CI as we can't prompt to
-    //     // prevent breaking setup flows
-    //     opts.typescript = getPrefOrDefault('typescript')
-    //   } else {
-    //     const styledTypeScript = blue('TypeScript')
-    //     const { typescript } = await prompts(
-    //       {
-    //         type: 'toggle',
-    //         name: 'typescript',
-    //         message: `Would you like to use ${styledTypeScript}?`,
-    //         initial: getPrefOrDefault('typescript'),
-    //         active: 'Yes',
-    //         inactive: 'No',
-    //       },
-    //       {
-    //         /**
-    //          * User inputs Ctrl+C or Ctrl+D to exit the prompt. We should close the
-    //          * process and not write to the file system.
-    //          */
-    //         onCancel: () => {
-    //           console.error('Exiting.')
-    //           process.exit(1)
-    //         },
-    //       }
-    //     )
-    //     /**
-    //      * Depending on the prompt response, set the appropriate program flags.
-    //      */
-    //     opts.typescript = Boolean(typescript)
-    //     opts.javascript = !Boolean(typescript)
-    //     preferences.typescript = Boolean(typescript)
-    //   }
-    // }
 
     if (!opts.drizzle && !args.includes('--no-drizzle')) {
       if (skipPrompt) {
@@ -357,16 +320,11 @@ async function run(): Promise<void> {
       packageManager,
       example: example && example !== 'default' ? example : undefined,
       examplePath: opts.examplePath,
-      // typescript: opts.typescript,
-      // tailwind: opts.tailwind,
       eslint: opts.eslint,
       drizzle: opts.drizzle,
-      // app: opts.app,
-      // srcDir: opts.srcDir,
       importAlias: opts.importAlias,
       skipInstall: opts.skipInstall,
       empty: opts.empty,
-      // turbopack: opts.turbopack,
       disableGit: opts.disableGit,
     })
   } catch (reason) {
@@ -390,16 +348,11 @@ async function run(): Promise<void> {
     await createApp({
       appPath,
       packageManager,
-      // typescript: opts.typescript,
       eslint: opts.eslint,
       drizzle: opts.drizzle,
-      // tailwind: opts.tailwind,
-      // app: opts.app,
-      // srcDir: opts.srcDir,
       importAlias: opts.importAlias,
       skipInstall: opts.skipInstall,
       empty: opts.empty,
-      // turbopack: opts.turbopack,
       disableGit: opts.disableGit,
     })
   }

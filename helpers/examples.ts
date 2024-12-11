@@ -28,11 +28,11 @@ export async function getRepoInfo(
   const filePath = examplePath ? examplePath.replace(/^\//, '') : file.join('/')
 
   if (
-    // Support repos whose entire purpose is to be a Next.js example, e.g.
-    // https://github.com/:username/:my-cool-nextjs-example-repo-name.
+    // Support repos whose entire purpose is to be example, e.g.
+    // https://github.com/:username/:my-cool-example-repo-name.
     t === undefined ||
     // Support GitHub URL that ends with a trailing slash, e.g.
-    // https://github.com/:username/:my-cool-nextjs-example-repo-name/
+    // https://github.com/:username/:my-cool-example-repo-name/
     // In this case "t" will be an empty string while the next part "_branch" will be undefined
     (t === '' && _branch === undefined)
   ) {

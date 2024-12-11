@@ -12,18 +12,17 @@ import pkg from "../package.json";
 import { GetTemplateFileArgs, InstallTemplateArgs } from "./types";
 
 /**
- * Get the file path for a given file in a template, e.g. "next.config.js".
+ * Get the file path for a given file in a template, e.g. "eslint.config.mjs".
  */
 export const getTemplateFile = ({
   template,
-  mode,
   file,
 }: GetTemplateFileArgs): string => {
-  return path.join(__dirname, template, mode, file);
+  return path.join(__dirname, template, file);
 };
 
 /**
- * Install a Next.js internal template to a given `root` directory.
+ * Install internal template to a given `root` directory.
  */
 export const installTemplate = async ({
   appName,
@@ -31,7 +30,6 @@ export const installTemplate = async ({
   packageManager,
   isOnline,
   template,
-  mode,
   drizzle,
   eslint,
   importAlias,
@@ -43,16 +41,20 @@ export const installTemplate = async ({
    * Copy the template files to the target directory.
    */
   console.log("\nInitializing project with template:", template, "\n");
-  const templatePath = path.join(__dirname, template, mode);
+  const templatePath = path.join(__dirname, template);
   const copySource = ["**"];
+
+  console.log("Copying files:", templatePath, "=>", root);
 
   if (!eslint) {
     copySource.push("!eslint.config.mjs", "!prettierrc");
   }
 
   if (!drizzle) {
-    copySource.push(mode == "ts" ? "drizzle.config.ts" : "!drizzle.config.json");
+    copySource.push("drizzle.config.js");
   }
+
+  copySource.push("!tsconfig.json");
 
   await copy(copySource, root, {
     parents: true,
@@ -80,16 +82,11 @@ export const installTemplate = async ({
 
   const tsconfigFile = path.join(
     root,
-    mode === "js" ? "jsconfig.json" : "tsconfig.json",
+    "tsconfig.json",
   );
   await fs.writeFile(
     tsconfigFile,
-    (await fs.readFile(tsconfigFile, "utf8"))
-      // .replace(
-      //   `"~/*": ["./src/*"]`,
-      //   // srcDir ? `"~/*": ["./src/*"]` : `"~/*": ["./*"]`,
-      // )
-      .replace(`"~/*":`, `"${importAlias}":`),
+    (await fs.readFile(tsconfigFile, "utf8")).replace(`"~/*":`, `"${importAlias}":`),
   );
 
   // update import alias in any files if not using the default
@@ -129,16 +126,16 @@ export const installTemplate = async ({
   }
 
   /** Copy the version from package.json or override for tests. */
-  const version = process.env.NEXT_PRIVATE_TEST_VERSION ?? pkg.version;
+  const version = process.env.PRIVATE_TEST_VERSION ?? pkg.version;
 
   /** Create a package.json for the new project and write it to disk. */
   const packageJson: any = {
     name: appName,
-    version: "0.1.0",
+    version,
     private: true,
-    main: mode === "ts" ? "src/index.ts" : "src/index.js",
+    main: "src/index.js",
     scripts: {
-      dev: `tsx watch --clear-screen=false ./src/index.${mode === "ts" ? "ts" : "js"}`,
+      dev: "tsx watch --clear-screen=false ./src/index.js",
       build: "pkgroll --clean-dist --sourcemap",
       start: "node ./dist/index.js",
       lint: "eslint",
@@ -154,25 +151,16 @@ export const installTemplate = async ({
       zod: "^3.24"
     },
     devDependencies: {
-      pkgroll: '^2.5',
-      supertest: '^7.0',
-      vitest: '^2.1'
-    },
-  };
-
-  /**
-   * TypeScript projects will have type definitions and other devDependencies.
-   */
-  if (mode === "ts") {
-    packageJson.devDependencies = {
-      ...packageJson.devDependencies,
       '@types/supertest': "^6.0",
       '@types/express': "^5.0",
+      pkgroll: '^2.5',
+      supertest: '^7.0',
+      vitest: '^2.1',
+      'vite-tsconfig-paths': '^5.1',
       tsx: '^4.19',
       typescript: '^5.7',
-      'vite-tsconfig-paths': '^5.1',
-    };
-  }
+    },
+  };
 
   /* Add drizzle dependencies. */
   if (drizzle) {
@@ -195,6 +183,7 @@ export const installTemplate = async ({
       "@eslint/js": "^9.16",
       "eslint": "^9.16",
       "eslint-plugin-prettier": "^5.2",
+      "globals": "^15.13",
       "prettier": "^3.4",
       "typescript-eslint": "^8.18",
     };
