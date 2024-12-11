@@ -11,10 +11,6 @@ import pkg from "../package.json";
 
 import { GetTemplateFileArgs, InstallTemplateArgs } from "./types";
 
-// Do not rename or format. sync-react script relies on this line.
-// prettier-ignore
-const nextjsReactPeerVersion = "^19.0.0";
-
 /**
  * Get the file path for a given file in a template, e.g. "next.config.js".
  */
@@ -25,8 +21,6 @@ export const getTemplateFile = ({
 }: GetTemplateFileArgs): string => {
   return path.join(__dirname, template, mode, file);
 };
-
-export const SRC_DIR_NAMES = ["app", "pages", "styles"];
 
 /**
  * Install a Next.js internal template to a given `root` directory.
@@ -50,23 +44,26 @@ export const installTemplate = async ({
    */
   console.log("\nInitializing project with template:", template, "\n");
   const templatePath = path.join(__dirname, template, mode);
-  console.log("Copying files from:", templatePath);
   const copySource = ["**"];
-  if (!eslint) copySource.push("!eslint.config.mjs");
-  if (!drizzle) copySource.push(mode == "ts" ? "drizzle.config.ts" : "!drizzle.config.mjs");
-  // if (!tailwind)
-  //   copySource.push(
-  //     mode == "ts" ? "tailwind.config.ts" : "!tailwind.config.mjs",
-  //     "!postcss.config.mjs",
-  //   );
 
+  if (!eslint) {
+    copySource.push("!eslint.config.mjs", "!prettierrc");
+  }
+
+  if (!drizzle) {
+    copySource.push(mode == "ts" ? "drizzle.config.ts" : "!drizzle.config.json");
+  }
 
   await copy(copySource, root, {
     parents: true,
     cwd: templatePath,
     rename(name) {
       switch (name) {
-        case "gitignore": {
+        case "gitignore":
+        case "prettierrc":
+        case "nvmrc":
+        case "env.example":
+        case "env": {
           return `.${name}`;
         }
         // README.md is ignored by webpack-asset-relocator-loader used by ncc:
@@ -131,52 +128,6 @@ export const installTemplate = async ({
     );
   }
 
-  // if (srcDir) {
-  //   await fs.mkdir(path.join(root, "src"), { recursive: true });
-  //   await Promise.all(
-  //     SRC_DIR_NAMES.map(async (file) => {
-  //       await fs
-  //         .rename(path.join(root, file), path.join(root, "src", file))
-  //         .catch((err) => {
-  //           if (err.code !== "ENOENT") {
-  //             throw err;
-  //           }
-  //         });
-  //     }),
-  //   );
-
-  //   const isAppTemplate = template.startsWith("app");
-
-  //   // Change the `Get started by editing pages/index` / `app/page` to include `src`
-  //   const indexPageFile = path.join(
-  //     "src",
-  //     isAppTemplate ? "app" : "pages",
-  //     `${isAppTemplate ? "page" : "index"}.${mode === "ts" ? "tsx" : "js"}`,
-  //   );
-
-  //   await fs.writeFile(
-  //     indexPageFile,
-  //     (await fs.readFile(indexPageFile, "utf8")).replace(
-  //       isAppTemplate ? "app/page" : "pages/index",
-  //       isAppTemplate ? "src/app/page" : "src/pages/index",
-  //     ),
-  //   );
-
-  //   if (tailwind) {
-  //     const tailwindConfigFile = path.join(
-  //       root,
-  //       mode === "ts" ? "tailwind.config.ts" : "tailwind.config.mjs",
-  //     );
-  //     await fs.writeFile(
-  //       tailwindConfigFile,
-  //       (await fs.readFile(tailwindConfigFile, "utf8")).replace(
-  //         /\.\/(\w+)\/\*\*\/\*\.\{js,ts,jsx,tsx,mdx\}/g,
-  //         "./src/$1/**/*.{js,ts,jsx,tsx,mdx}",
-  //       ),
-  //     );
-  //   }
-  // }
-
   /** Copy the version from package.json or override for tests. */
   const version = process.env.NEXT_PRIVATE_TEST_VERSION ?? pkg.version;
 
@@ -185,21 +136,28 @@ export const installTemplate = async ({
     name: appName,
     version: "0.1.0",
     private: true,
+    main: mode === "ts" ? "src/index.ts" : "src/index.js",
     scripts: {
-      dev: `ncc dev`,
-      build: "ncc build",
+      dev: `tsx watch --clear-screen=false ./src/index.${mode === "ts" ? "ts" : "js"}`,
+      build: "pkgroll --clean-dist --sourcemap",
       start: "node ./dist/index.js",
       lint: "eslint",
+      test: "vitest",
     },
     /**
      * Default dependencies.
      */
     dependencies: {
-      // react: nextjsReactPeerVersion,
-      // "react-dom": nextjsReactPeerVersion,
-      // next: version,
+      dotenv: "^16.4",
+      envalid: "^8.0",
+      express: "^5.0",
+      zod: "^3.24"
     },
-    devDependencies: {},
+    devDependencies: {
+      pkgroll: '^2.5',
+      supertest: '^7.0',
+      vitest: '^2.1'
+    },
   };
 
   /**
@@ -208,31 +166,25 @@ export const installTemplate = async ({
   if (mode === "ts") {
     packageJson.devDependencies = {
       ...packageJson.devDependencies,
-      typescript: "^5",
-      "@types/node": "^20",
-      "@types/react": "^19",
-      "@types/react-dom": "^19",
+      '@types/supertest': "^6.0",
+      '@types/express': "^5.0",
+      tsx: '^4.19',
+      typescript: '^5.7',
+      'vite-tsconfig-paths': '^5.1',
     };
   }
-
-  // /* Add Tailwind CSS dependencies. */
-  // if (tailwind) {
-  //   packageJson.devDependencies = {
-  //     ...packageJson.devDependencies,
-  //     postcss: "^8",
-  //     tailwindcss: "^3.4.1",
-  //   };
-  // }
 
   /* Add drizzle dependencies. */
   if (drizzle) {
     packageJson.dependencies = {
       ...packageJson.dependencies,
-      'drizzle-orm': "*",
+      'drizzle-orm': "^0.38",
+      pg: '^8.13'
     };
     packageJson.devDependencies = {
       ...packageJson.devDependencies,
-      'drizzle-kit': "*",
+      '@types/pg': '^8.11',
+      'drizzle-kit': '^0.30',
     };
   }
 
@@ -240,10 +192,11 @@ export const installTemplate = async ({
   if (eslint) {
     packageJson.devDependencies = {
       ...packageJson.devDependencies,
-      eslint: "^9",
-      "eslint-config-next": version,
-      // TODO: Remove @eslint/eslintrc once eslint-config-next is pure Flat config
-      "@eslint/eslintrc": "^3",
+      "@eslint/js": "^9.16",
+      "eslint": "^9.16",
+      "eslint-plugin-prettier": "^5.2",
+      "prettier": "^3.4",
+      "typescript-eslint": "^8.18",
     };
   }
 

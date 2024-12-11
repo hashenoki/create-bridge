@@ -60,7 +60,8 @@ export async function createApp({
   // const mode: TemplateMode = typescript ? 'ts' : 'js'
   const mode: TemplateMode = 'ts';
   // const template: TemplateType = `${app ? 'app' : 'default'}${tailwind ? '-tw' : ''}${empty ? '-empty' : ''}`
-  const template: TemplateType = `default${drizzle ? '-drizzle' : ''}${empty ? '-empty' : ''}`
+  // const template: TemplateType = `default${drizzle ? '-drizzle' : ''}${empty ? '-empty' : ''}`
+  const template: TemplateType = `default${drizzle ? '-drizzle' : ''}`
 
   if (example) {
     let repoUrl: URL | undefined

@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=secret
+    networks:
+      - dev-network
+    volumes:
+      - ./.docker/dev/postgres:/data/db
+    ports:
+      - "5432:5432"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  dev-network:
+    driver: bridge

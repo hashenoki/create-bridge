@@ -52,7 +52,7 @@ const program = new Command(packageJson.name)
     '--import-alias <prefix/*>',
     'Specify import alias to use (default "~/*").'
   )
-  .option('--empty', 'Initialize an empty project.')
+  // .option('--empty', 'Initialize an empty project.')
   .option(
     '--use-npm',
     'Explicitly tell the CLI to bootstrap the application using npm.'
@@ -223,13 +223,9 @@ async function run(): Promise<void> {
       // typescript: true,
       eslint: true,
       drizzle: true,
-      // tailwind: true,
-      // app: true,
-      // srcDir: false,
       importAlias: '~/*',
       customizeImportAlias: false,
       empty: false,
-      // turbopack: true,
       disableGit: false,
     }
     const getPrefOrDefault = (field: string) =>
@@ -271,9 +267,9 @@ async function run(): Promise<void> {
     //   }
     // }
 
-    if (!opts.drizzle && !args.includes('--no-drizzld')) {
+    if (!opts.drizzle && !args.includes('--no-drizzle')) {
       if (skipPrompt) {
-        opts.eslint = getPrefOrDefault('drizzle')
+        opts.drizzle = getPrefOrDefault('drizzle')
       } else {
         const styledDrizzle = blue('Drizzle ORM')
         const { drizzle } = await prompts({
@@ -286,7 +282,7 @@ async function run(): Promise<void> {
           inactive: 'No',
         })
         opts.drizzle = Boolean(drizzle)
-        preferences.eslint = Boolean(drizzle)
+        preferences.drizzle = Boolean(drizzle)
       }
     }
 
@@ -295,11 +291,12 @@ async function run(): Promise<void> {
         opts.eslint = getPrefOrDefault('eslint')
       } else {
         const styledEslint = blue('ESLint')
+        const styledPrettier = blue('Prettier')
         const { eslint } = await prompts({
           onState: onPromptState,
           type: 'toggle',
           name: 'eslint',
-          message: `Would you like to use ${styledEslint}?`,
+          message: `Would you like to use ${styledEslint} & ${styledPrettier}?`,
           initial: getPrefOrDefault('eslint'),
           active: 'Yes',
           inactive: 'No',

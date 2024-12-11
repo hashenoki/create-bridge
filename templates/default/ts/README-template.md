@@ -2,20 +2,6 @@
 
 TBD
 
-# Local database setup
-
-1. Use docker compose:
-
-```bash
-docker-compose up -d
-```
-
-2. Add the following environment variables to your `.env` file:
-
-```bash
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
-```
-
 
 # Docker build
 
