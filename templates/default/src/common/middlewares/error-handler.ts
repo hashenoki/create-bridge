@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { CustomError } from '../utils/custom-error';
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { CustomError } from '~/common/utils/custom-error';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: Error, req: Request, res: Response, _: NextFunction) {
@@ -7,7 +8,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _: NextFun
     res
       .status(err.statusCode)
       .json({
-        status: 'fail',
+        status: ReasonPhrases.BAD_REQUEST,
         code: err.statusCode,
         message: err.message,
       })
@@ -16,9 +17,9 @@ export function errorHandler(err: Error, req: Request, res: Response, _: NextFun
   }
 
   res
-    .status(500)
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
     .json({
-      status: 'internal-server-error',
+      status: ReasonPhrases.INTERNAL_SERVER_ERROR,
       message: err.message,
     })
     .end();

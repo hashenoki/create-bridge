@@ -1,8 +1,9 @@
 import express, { Express } from 'express';
-import { auth } from './api/auth/auth.router';
-import { errorHandler } from './middlewares/error-handler';
-import { fallbackHandler } from './middlewares/fallback-handler';
+import { healthCheck } from '~/api/health-check';
+import { errorHandler } from '~/common/middlewares/error-handler';
+import { fallbackHandler } from '~/common/middlewares/fallback-handler';
 import { env } from '~/config';
+import { homeRoute } from '~/api/home';
 
 const app: Express = express();
 
@@ -15,15 +16,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // routes
-app.get('/', (_, res) => {
-  res.json('Hello World!').end();
-});
-app.use('/auth', auth);
-
-// example route to throw error
-app.get('/throw', (req, res, next) => {
-  next(new Error('throw internal error.'));
-});
+app.get('/', homeRoute);
+app.use('/health-check', healthCheck);
 
 // handle 404
 app.all('*fallback', fallbackHandler);

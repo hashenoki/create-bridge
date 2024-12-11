@@ -8,11 +8,14 @@ describe('Endpoints', () => {
     const body = response.body;
 
     expect(response.status).toEqual(200);
-    expect(body).toEqual('Hello World!');
+    expect(body).toEqual({ hello: 'world' });
   });
 
-  it('GET /throw', async () => {
-    const response = await request(app).get('/throw');
-    expect(response.status).toEqual(500);
+  it('GET /health-check', async () => {
+    const response = await request(app).get('/health-check');
+    const body = response.body;
+
+    expect(response.status).toEqual(200);
+    expect(body).toEqual({ status: 'ok' });
   });
 });

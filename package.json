@@ -1,9 +1,12 @@
 {
   "name": "create-bridge",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "node",
-    "express"
+    "express",
+    "drizzle",
+    "api",
+    "boilerplate"
   ],
   "description": "Create node api with one command",
   "author": "Rytis Grincevicius",

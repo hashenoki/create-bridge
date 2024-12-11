@@ -7,7 +7,7 @@ import fs from "fs/promises";
 import path from "path";
 import { cyan, bold } from "picocolors";
 import { Sema } from "async-sema";
-import pkg from "../package.json";
+// import pkg from "../package.json";
 
 import { GetTemplateFileArgs, InstallTemplateArgs } from "./types";
 
@@ -18,6 +18,7 @@ export const getTemplateFile = ({
   template,
   file,
 }: GetTemplateFileArgs): string => {
+  // note missing "templates" directory in paths - this is intentional, otherwise templates become built into the binary
   return path.join(__dirname, template, file);
 };
 
@@ -41,10 +42,8 @@ export const installTemplate = async ({
    * Copy the template files to the target directory.
    */
   console.log("\nInitializing project with template:", template, "\n");
-  const templatePath = path.join(__dirname, template);
+  const templatePath = path.join(__dirname, 'templates', template);
   const copySource = ["**"];
-
-  console.log("Copying files:", templatePath, "=>", root);
 
   if (!eslint) {
     copySource.push("!eslint.config.mjs", "!prettierrc");
@@ -53,8 +52,6 @@ export const installTemplate = async ({
   if (!drizzle) {
     copySource.push("drizzle.config.js");
   }
-
-  copySource.push("!tsconfig.json");
 
   await copy(copySource, root, {
     parents: true,
@@ -126,14 +123,14 @@ export const installTemplate = async ({
   }
 
   /** Copy the version from package.json or override for tests. */
-  const version = process.env.PRIVATE_TEST_VERSION ?? pkg.version;
+  /** const version = process.env.PRIVATE_TEST_VERSION ?? pkg.version; */
 
   /** Create a package.json for the new project and write it to disk. */
   const packageJson: any = {
     name: appName,
-    version,
+    version: '0.1.0',
     private: true,
-    main: "src/index.js",
+    main: "./dist/index.js",
     scripts: {
       dev: "tsx watch --clear-screen=false ./src/index.js",
       build: "pkgroll --clean-dist --sourcemap",
@@ -148,6 +145,7 @@ export const installTemplate = async ({
       dotenv: "^16.4",
       envalid: "^8.0",
       express: "^5.0",
+      "http-status-codes": "^2.3",
       zod: "^3.24"
     },
     devDependencies: {
@@ -161,6 +159,9 @@ export const installTemplate = async ({
       typescript: '^5.7',
     },
   };
+
+  /** Create .vscode/settings.json config file */
+  const vscodeSettings: any = {};
 
   /* Add drizzle dependencies. */
   if (drizzle) {
@@ -182,11 +183,14 @@ export const installTemplate = async ({
       ...packageJson.devDependencies,
       "@eslint/js": "^9.16",
       "eslint": "^9.16",
+      "eslint-config-prettier": "^9.1",
       "eslint-plugin-prettier": "^5.2",
       "globals": "^15.13",
       "prettier": "^3.4",
       "typescript-eslint": "^8.18",
     };
+
+    vscodeSettings["eslint.useFlatConfig"] = true;
   }
 
   const devDeps = Object.keys(packageJson.devDependencies).length;
@@ -196,6 +200,14 @@ export const installTemplate = async ({
     path.join(root, "package.json"),
     JSON.stringify(packageJson, null, 2) + os.EOL,
   );
+
+  if (Object.keys(vscodeSettings).length) {
+    await fs.mkdir(path.join(root, ".vscode"), { recursive: true });
+    await fs.writeFile(
+      path.join(root, ".vscode/settings.json"),
+      JSON.stringify(vscodeSettings, null, 2) + os.EOL,
+    );
+  }
 
   if (skipInstall) return;
 
