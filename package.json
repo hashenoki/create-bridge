@@ -1,6 +1,6 @@
 {
   "name": "create-bridge",
-  "version": "0.0.2",
+  "version": "0.0.3-next.0",
   "keywords": [
     "node",
     "express",
@@ -47,6 +47,7 @@
     "picocolors": "1.0.0",
     "prompts": "2.4.2",
     "tar": "7.4.3",
+    "typescript": "^5.7.2",
     "update-check": "1.5.4",
     "validate-npm-package-name": "5.0.1"
   },

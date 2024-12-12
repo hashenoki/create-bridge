@@ -62,6 +62,9 @@ importers:
       tar:
         specifier: 7.4.3
         version: 7.4.3
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.2
       update-check:
         specifier: 1.5.4
         version: 1.5.4
@@ -693,6 +696,11 @@ packages:
   type-fest@4.30.0:
     resolution: {integrity: sha512-G6zXWS1dLj6eagy6sVhOMQiLtJdxQBHIA9Z6HFUNLOlr6MFOgzV8wvmidtPONfPtEUv0uZsy77XJNzTAfwPDaA==}
     engines: {node: '>=16'}
+
+  typescript@5.7.2:
+    resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
+    engines: {node: '>=14.17'}
+    hasBin: true
 
   uint8array-extras@1.4.0:
     resolution: {integrity: sha512-ZPtzy0hu4cZjv3z5NW9gfKnNLjoz4y6uv4HlelAjDK7sY/xOkKZv9xK/WQpcsBB3jEybChz9DPC2U/+cusjJVQ==}
@@ -1402,6 +1410,8 @@ snapshots:
       is-number: 7.0.0
 
   type-fest@4.30.0: {}
+
+  typescript@5.7.2: {}
 
   uint8array-extras@1.4.0: {}
 

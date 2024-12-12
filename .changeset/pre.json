@@ -4,5 +4,7 @@
   "initialVersions": {
     "create-bridge": "0.0.2"
   },
-  "changesets": []
+  "changesets": [
+    "strong-mails-drum"
+  ]
 }
